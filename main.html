@@ -1,0 +1,157 @@
+<style>
+    body {margin:0; height:100%;}
+    .window
+    {
+        background-color: rgb(215, 215, 215);
+        width: 100vw;
+        min-height: 100%;
+    }
+    .game
+    {
+        padding: 5vh;
+    }
+    .box
+    {
+        height: 8vh;
+        width: 8vh;
+        border-color: black;
+        border-style: solid;
+        border-width: 1vh;
+        margin-bottom: 2vh;
+    }
+    .button 
+    {
+        margin-bottom:2vh; 
+        width:10vh;
+    }
+    .answer
+    {
+        margin-left: 3vw;
+    }
+    .inputs
+    {
+
+    }
+</style>
+
+
+<center>
+<div class="window">
+    <div class="game" id="game">
+        <button 
+        class="button"
+        onclick="StartGame()"
+        id="start">
+            start
+        </button>
+    </div>
+    <div class="inputs">
+        <input id="answer" type="text" class="answer" maxlength="5">
+        <button 
+        class="button"
+        id="submit"
+        disabled
+        onclick="CheckAnswers()"
+        >
+        submit
+        </button>
+        <p style="margin-left:3vw;">Red: r, Blue: b, Green: g, Yellow: y, Purple: p</h4>
+    </div>
+    <br><br><br>
+    <h1>the game</h1>
+    <h3 style="width:80vw;">The aim of the game is to memorize the 
+        list of colors and starting the game. 
+        After the game has started, the colors
+        will switch positions randomly. Your job
+        is to write the new positions in the box
+        and to submit. This game is not easy and
+        only meant for people with good memories
+        ( I have never won so far :D )</h3>
+    <br>
+</div>
+</center>
+
+
+<script>
+    var colors = ["red","blue","yellow","green","purple"]
+    var order = [];
+    for(let i = 0; i < 5; i++)
+    {
+        var element = document.createElement("div");
+        element.id = "box"+i;
+        element.className = "box";
+        let color = colors[Math.floor(Math.random()*colors.length)];
+        element.style.backgroundColor = color;
+
+        var index = colors.indexOf(color);
+        if (index !== -1) {
+            colors.splice(index, 1);
+        }
+
+        order.push(color);
+
+        document.getElementById('game').appendChild(element);  
+    }
+    
+
+    async function StartGame()
+    {
+        start = document.querySelector('#start');
+        start.disabled = true;
+        for(let i = 0; i < 5; i++)
+        {
+            box = document.getElementById('box'+i);  
+            box.style.backgroundColor = "transparent";
+        }
+        await new Promise(r => setTimeout(r, 1000));
+        for(let i = 0; i < 3; i++)
+        {
+            id = Math.floor(Math.random() * 4);
+            id2 = Math.floor(Math.random() * 4);
+            box = document.getElementById('box'+id); 
+            box2 = document.getElementById('box'+id2); 
+            while(box === box2)
+            {
+                id2 = Math.floor(Math.random() * 4);
+                box2 = document.getElementById('box'+Math.floor(Math.random() * 4)); 
+            }
+            box.style.backgroundColor = "red";
+            box2.style.backgroundColor = "blue";
+
+            c1 = order[id];
+            c2 = order[id2];
+
+            order[id] = c2;
+            order[id2] = c1;
+
+            await new Promise(r => setTimeout(r, 2000));
+            box.style.backgroundColor = "transparent";
+            box2.style.backgroundColor = "transparent";
+            await new Promise(r => setTimeout(r, 500));
+        }
+        document.getElementById("submit").disabled = false;
+        answer = ""
+        for(let i = 0; i < 5; i++)
+        {
+            answer += order[i].charAt(0);
+        }
+    }
+    function CheckAnswers()
+    {
+        answer = ""
+        for(let i = 0; i < 5; i++)
+        {
+            answer += order[i].charAt(0);
+        }
+        answerBox = document.getElementById('answer').value;
+        if(answer === answerBox)
+        {
+            alert("Thats right!")
+        }
+        else
+        {
+            alert("thats not quite right....\nanswer: "+answer+"\nYour answer:" +answerBox)
+        }
+        location.reload(true);
+    }
+</script>
